@@ -1,0 +1,38 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: rabbit-streamer
+spec:
+  selector:
+    app: rabbit-streamer
+  ports:
+    - protocol: "TCP"
+      # Port accessible inside cluster
+      port: 32100
+      # Port to forward to inside the pod
+      targetPort: 32100
+      # Port accessible outside cluster
+      nodePort: 32100
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbit-streamer
+spec:
+  selector:
+    matchLabels:
+      app: rabbit-streamer
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: rabbit-streamer
+    spec:
+      containers:
+        - name: rabbit-streamer
+          image: sittipatcha/rabbit-streamer
+          ports:
+            - containerPort: 32100
